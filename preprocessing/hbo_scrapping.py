@@ -4,18 +4,13 @@ def get_links_cat() -> str:
     driver = driver_open()
     try:
         driver.get("https://help.max.com/es-es/Home/Index")
-
-        # Aumentar el tiempo de espera para elementos dinámicos
         wait = WebDriverWait(driver, 20)
-
-        # Esperar a que el enlace con la clase 'ViewAll' sea visible
         link_element = wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "a.ViewAll")))
         titles = wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "h2.cat-heading")))
         titles = [t.text for t in titles]
         links = []
         i = 0
         for link in link_element:
-            # Obtener el atributo href del enlace
             href = link.get_attribute("href")
             links.append([titles[i],href])
             i +=1
@@ -68,9 +63,8 @@ def get_info_subsection(link)->str:
         driver.get(link)
         wait = WebDriverWait(driver, 10)
 
-        info_section = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "section.AnswerBody")))
+        info_section = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "section#AnswerBody")))
         info_section = info_section.get_attribute('innerText')
-        print(info_section)
     
 
     finally:
@@ -80,11 +74,39 @@ def get_info_subsection(link)->str:
 
 
 
+
 # Ejecutar el script
 if __name__ == "__main__":
-    link = get_links_cat()
-    print(f"Enlace encontrado: {link}")
-    links_sections = get_link_sections(link[0][1])
-    print(f"links de cada sección para primera categoria {links_sections}")
-    info_section = get_info_subsection(links_sections[0][2])
-    print(f"Información para primer seccion de la primera categoría: {info_section}")
+    
+    #Searchs for help categories
+    categories = get_links_cat()
+    
+    print(f"Enlace encontrado: {categories}")
+    lista_info = []
+    for cat in categories:
+        cat_title = cat[0]
+        lista_cat = []
+
+        #Searchs for each subcategory / section
+        links_sections = get_link_sections(cat[1])
+        for sec in links_sections:
+
+            sec_title = sec[0]
+            subsec_title = sec[1]
+
+            #Gets the info for each subcategory
+            info_section = get_info_subsection(sec[2])
+            
+            #Saves category title, subcategor title, info and source link
+            lista_cat.append([cat_title,sec_title,subsec_title, info_section, sec[2]])
+            print(f"Category: {cat_title}")
+            print(f"Secction: {sec_title}")
+            print(f"Subsection: {subsec_title}")
+            print(f"Info section: {info_section}")
+            lista_info.extend(lista_cat)
+            print(len(lista_cat))
+
+    #Converts and saves to .csv all the info collected in the folder "/processed_data"
+    csv_help_max = pd.DataFrame(lista_info, columns=['Category','Section','Sub Section','Info', 'Link'])
+    csv_help_max.to_csv("data/processed_data/max_help.csv")
+        
