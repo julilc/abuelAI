@@ -75,7 +75,7 @@ def scrapping_help_netflix()->None:
 
 data = scrapping_help_netflix()
 print(data) 
-data_csv = pd.DataFrame(data,columns=['Title','data'])
+data_csv = pd.DataFrame(data,columns=['Title','Info'])
 data_csv.to_csv("data/processed_data/netflix_help.csv", index_label=None)
 print(data_csv)
 
