@@ -30,7 +30,9 @@ def prepare_info(data, embed, main_id):
                 continue
 
             # Crear key_words con todas las columnas
-            key_words = {col: row[col] for col in row.index[1:]}
+            key_columns = row.index
+            key_columns = key_columns.drop('Info')
+            key_words = {col: row[col] for col in key_columns}
 
             j = 0
             for p in chunks:
