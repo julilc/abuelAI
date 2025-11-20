@@ -163,4 +163,10 @@ export MONGO_DB="abuelai"
 python agent/main.py
 ```
 
+---
+
+## Contributions
+
+Any comments or contributions feel free to reach me:
+https://www.linkedin.com/in/julietalc/
 
