@@ -1,13 +1,15 @@
 from config import vector_collection
-from embedding import embed
+from modules.embedding import embed
+
+
 
 # Define a vector search tool
-def vector_search_tool(user_input: str) -> str:
-    query_embedding = embed(user_input)
+def netflix_search_tool(user_input: str) -> str:
+    query_embedding = embed(user_input).tolist()
     pipeline = [
         {
             "$vectorSearch": {
-                "index": "vector_index",
+                "index": "netflix_index",
                 "queryVector": query_embedding,
                 "path": "embedding",
                 "exact": True,
@@ -27,10 +29,52 @@ def vector_search_tool(user_input: str) -> str:
         array_of_results.append(doc)
     return array_of_results
 
-# Define a simple calculator tool
-def calculator_tool(user_input: str) -> str:
-    try:
-        result = eval(user_input)
-        return str(result)
-    except Exception as e:
-        return f"Error: {str(e)}" 
+def hbo_max_search_tool(user_input: str) -> str:
+    query_embedding = embed(user_input).tolist()
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "hbo_max_index",
+                "queryVector": query_embedding,
+                "path": "embedding",
+                "exact": True,
+                "limit": 5
+            }
+        }, {
+            "$project": {
+                "_id": 0,
+                "text": 1
+            }
+        }
+    ]
+    results = vector_collection.aggregate(pipeline)
+
+    array_of_results = []
+    for doc in results:
+        array_of_results.append(doc)
+    return array_of_results
+
+def prime_search_tool(user_input: str) -> str:
+    query_embedding = embed(user_input).tolist()
+    pipeline = [
+        {
+            "$vectorSearch": {
+                "index": "prime_index",
+                "queryVector": query_embedding,
+                "path": "embedding",
+                "exact": True,
+                "limit": 5
+            }
+        }, {
+            "$project": {
+                "_id": 0,
+                "text": 1
+            }
+        }
+    ]
+    results = vector_collection.aggregate(pipeline)
+
+    array_of_results = []
+    for doc in results:
+        array_of_results.append(doc)
+    return array_of_results
